@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+
+.env
+.env.*
+
+.agents/
+.codex/
+
+html_pages/fetched_*.html
+analysis/outputs/*.png
+
+.DS_Store
+Thumbs.db

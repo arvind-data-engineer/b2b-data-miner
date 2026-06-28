@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>B2B Data Miner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="../static/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">B2B data extraction</p>
+          <h1>Scrape product data from any permitted webpage URL</h1>
+          <p class="subhead">Paste a marketplace or listing page URL, then extract product names, prices, suppliers, locations, and categories into CSV and JSON outputs.</p>
+        </div>
+        <div class="metric">
+          <span>{{ records|length }}</span>
+          records ready
+        </div>
+      </section>
+
+      <section class="scraper-panel">
+        <form method="post" class="scrape-form">
+          <label class="url-field">
+            Webpage URL
+            <input name="url" type="url" value="{{ form.url }}" placeholder="https://example.com/products?search=machinery" required>
+          </label>
+
+          <div class="form-grid">
+            <label>
+              Category
+              <input name="category" value="{{ form.category }}" placeholder="industrial machinery">
+            </label>
+
+            <label>
+              Marketplace
+              <input name="marketplace" value="{{ form.marketplace }}" placeholder="indiamart">
+            </label>
+
+            <label>
+              Max pages
+              <input name="max_pages" type="number" value="{{ form.max_pages }}" min="1" max="5">
+            </label>
+          </div>
+
+          <div class="controls-row">
+            <label class="check">
+              <input name="respect_robots" type="checkbox" {% if form.respect_robots == "on" %}checked{% endif %}>
+              <span>Respect robots.txt</span>
+            </label>
+
+            <div class="actions">
+              <button type="submit">Scrape data</button>
+              <button type="submit" name="load_demo" value="1" class="secondary">Preview demo</button>
+            </div>
+          </div>
+
+          <p class="hint">Use URLs where automated crawling is allowed. Some marketplaces load product cards with JavaScript, so the app may fetch the page but find no rows.</p>
+        </form>
+      </section>
+
+      <section class="status-area">
+        <noscript>
+          <p class="notice">Open this project through the Flask app so the scraper can run.</p>
+        </noscript>
+
+        {% if saved_path %}
+          <p class="success">Fetched HTML saved to {{ saved_path }}</p>
+        {% endif %}
+
+        {% if messages %}
+          <div class="notice-list">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if error %}
+          <p class="notice">{{ error }}</p>
+        {% endif %}
+      </section>
+
+      <section class="results">
+        <div class="results-head">
+          <div>
+            <p class="eyebrow">Output</p>
+            <h2>Scraped records</h2>
+          </div>
+          <p>{{ records|length }} rows saved to <strong>data/cleaned_products.csv</strong></p>
+        </div>
+
+        {% if records %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Supplier</th>
+                  <th>Location</th>
+                  <th>Category</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in records %}
+                  <tr>
+                    <td>{{ item.product_name or "" }}</td>
+                    <td>{{ item.price or "" }}</td>
+                    <td>{{ item.supplier_name or "" }}</td>
+                    <td>{{ item.location or "" }}</td>
+                    <td>{{ item.category or "" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <h3>No data scraped yet</h3>
+            <p>Paste a product listing URL above and run the scraper. The extracted rows will appear here and will also be written to the project data files.</p>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+
+    <script>
+      if (document.body.innerText.includes("{{") || document.body.innerText.includes("{%")) {
+        document.body.innerHTML = `
+          <main class="shell">
+            <section class="scraper-panel direct-open">
+              <p class="eyebrow">Open through Flask</p>
+              <h1>B2B Data Miner needs the backend server</h1>
+              <p class="subhead">Start the app with <strong>python app.py</strong>, then open <strong>http://127.0.0.1:5000</strong>. The scraper cannot run from a double-clicked template file.</p>
+            </section>
+          </main>
+        `;
+      }
+    </script>
+  </body>
+</html>
