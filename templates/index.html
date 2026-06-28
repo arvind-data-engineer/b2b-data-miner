@@ -126,6 +126,7 @@
       </section>
     </main>
 
+    {% raw %}
     <script>
       if (document.body.innerText.includes("{{") || document.body.innerText.includes("{%")) {
         document.body.innerHTML = `
@@ -139,5 +140,6 @@
         `;
       }
     </script>
+    {% endraw %}
   </body>
 </html>
